@@ -22,9 +22,10 @@ module.exports = {
     },
     // webpack-dev-server
     devServer: {
-        historyApiFallback: true,
+        historyApiFallback: true, //不跳转
+        port: "8888",//设置默认监听端口，如果省略，默认为”8080“
         hot: true,
-        inline: true
+        inline: true //实时刷新
     },
     // 配置 loader
     module: {
