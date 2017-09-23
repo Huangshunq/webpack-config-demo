@@ -1,5 +1,7 @@
 import './style.scss';
 import generateText from './sub';
+import $ from 'jquery';
+import moment from 'moment';
 
 let app = document.createElement('div');
 const myPromise = Promise.resolve(42);
