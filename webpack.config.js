@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlwebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 // 路径
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'app');
@@ -10,15 +11,15 @@ const TEM_PATH = path.resolve(APP_PATH, 'templates');
 module.exports = {
     // 项目的文件夹，可以直接用文件夹名称，默认会找 index.js，也可以确定是哪个文件名字
     entry: {
-        "pageA/js/pageA": path.resolve(APP_PATH, 'pageA'),
-        "pageB/js/pageB": path.resolve(APP_PATH, 'pageB'),
+        "pageA": path.resolve(APP_PATH, 'pageA'),
+        "pageB": path.resolve(APP_PATH, 'pageB'),
         // 添加要打包在 vendors 里面的库
         vendors: ['jquery', 'moment']
     },
     //输出的文件名，根据 entry的入口文件名称生成多个js文件
     output: {
         path: BUILD_PATH,
-        filename: '[name].[hash].js',
+        filename: '[name]/js/[name].[hash].js',
         publicPath: '/'
     },
     // webpack-dev-server
@@ -60,7 +61,13 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap'],
+                // 提取 css 文件
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: ['css-loader', 'sass-loader']
+                }),
+                // 不提取 css 文件的做法
+                // loaders: ['style-loader', 'css-loader?sourceMap', 'sass-loader?sourceMap'],
                 include: APP_PATH
             }
         ]
@@ -82,7 +89,7 @@ module.exports = {
             template: path.resolve(TEM_PATH, 'pageA.html'),
             filename: 'pageA/pageA.html',
             //chunks这个参数告诉插件要引用entry里面的哪几个入口
-            chunks: ['pageA/js/pageA', 'vendors'],
+            chunks: ['pageA', 'vendors'],
             //要把script插入到标签里
             inject: 'body'
         }),
@@ -90,8 +97,12 @@ module.exports = {
             title: 'pageB',
             template: path.resolve(TEM_PATH, 'pageB.html'),
             filename: 'pageB/pageB.html',
-            chunks: ['pageB/js/pageB', 'vendors'],
+            chunks: ['pageB', 'vendors'],
             inject: 'body'
+        }),
+        // 提取 css 为一个文件
+        new ExtractTextPlugin({
+            filename: '[name]/css/style.css'
         })
     ],
     devtool: 'eval-source-map'
